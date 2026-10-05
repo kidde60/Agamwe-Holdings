@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { font-family: 'DM Sans', system-ui, sans-serif; color: #172118; background: #fff; font-synthesis: none; text-rendering: optimizeLegibility; }
+html { scroll-behavior: smooth; }
+body { margin: 0; min-width: 320px; }
+button, input, textarea { font: inherit; }
+button { cursor: pointer; }
+.section-title { @apply mt-3 text-4xl font-black tracking-tight text-ink sm:text-5xl; font-family: 'Manrope', sans-serif; }
+.eyebrow { @apply text-lg font-black uppercase tracking-[.2em] text-forest; }
+.field { @apply block; }
+.field span { @apply mb-2 block text-sm font-bold text-slate-700; }
+.field input, .field textarea { @apply w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 outline-none transition placeholder:text-slate-400 focus:border-forest focus:bg-white focus:ring-4 focus:ring-forest/10; }
+::selection { background: #dbeacb; color: #172118; }
+
+/* Navigation visibility control */
+.nav-item {
+  @apply text-sm font-bold transition;
+}
+
+.nav-item.active {
+  @apply text-forest border-b-2 border-forest pb-1;
+}
+
+.nav-item:not(.active) {
+  @apply text-slate-700 hover:text-forest;
+}
+
+/* Hide nav items on smaller screens */
+@media (max-width: 1024px) {
+  .nav-item-insights,
+  .nav-item-contact {
+    @apply hidden;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-desktop {
+    @apply hidden;
+  }
+}
+
+/* Responsive nav spacing */
+@media (max-width: 1024px) {
+  .nav-gap {
+    @apply gap-3;
+  }
+}
+
+@media (min-width: 1025px) {
+  .nav-gap {
+    @apply gap-6;
+  }
+}
+
+/* Motion system */
+@keyframes float-slow { 0%, 100% { transform: translateY(0) translateX(0); } 50% { transform: translateY(-12px) translateX(4px); } }
+@keyframes pulse-soft { 0%, 100% { opacity: .45; transform: scale(1); } 50% { opacity: .75; transform: scale(1.06); } }
+@keyframes marquee-glow { 0%, 100% { opacity: .25; } 50% { opacity: .6; } }
+@keyframes reveal-up { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+.reveal-hidden { opacity: 0; transform: translateY(28px); transition: opacity .75s ease, transform .75s cubic-bezier(.2,.8,.2,1); }
+.reveal-visible { opacity: 1; transform: translateY(0); transition: opacity .75s ease, transform .75s cubic-bezier(.2,.8,.2,1); }
+.float-slow { animation: float-slow 6s ease-in-out infinite; }
+.pulse-soft { animation: pulse-soft 5s ease-in-out infinite; }
+.animate-page { animation: reveal-up .7s cubic-bezier(.2,.8,.2,1) both; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
