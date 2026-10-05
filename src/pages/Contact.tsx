@@ -1,22 +1,50 @@
 import React from "react";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Send,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 import { Reveal } from "../components/Reveal";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import emailjs from "@emailjs/browser";
 
 export function Contact() {
-  const [sent, setSent] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(
+    null,
+  );
 
-  const submit = (e: React.FormEvent<HTMLFormElement>) => {
+  // Initialize EmailJS
+  useEffect(() => {
+    emailjs.init("YOUR_PUBLIC_KEY_HERE");
+  }, []);
+
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = new FormData(e.currentTarget);
-    const subject = encodeURIComponent(
-      `Website enquiry from ${data.get("name") || "a visitor"}`,
-    );
-    const body = encodeURIComponent(
-      `Name: ${data.get("name")}\nEmail: ${data.get("email")}\nOrganisation: ${data.get("organisation") || "Not provided"}\n\n${data.get("message")}`,
-    );
-    window.location.href = `mailto:agamweholdings2@gmail.com?subject=${subject}&body=${body}`;
-    setSent(true);
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+
+    try {
+      if (formRef.current) {
+        await emailjs.sendForm(
+          "YOUR_SERVICE_ID",
+          "YOUR_TEMPLATE_ID",
+          formRef.current,
+          "YOUR_PUBLIC_KEY_HERE",
+        );
+        setSubmitStatus("success");
+        formRef.current.reset();
+      }
+    } catch (error) {
+      console.error("Email send failed:", error);
+      setSubmitStatus("error");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -73,18 +101,19 @@ export function Contact() {
           </div>
         </div>
         <form
+          ref={formRef}
           onSubmit={submit}
           className="rounded-[2rem] bg-white p-7 shadow-soft lg:p-9"
         >
           <div className="grid gap-5 sm:grid-cols-2">
             <label className="field">
               <span>Name</span>
-              <input name="name" required placeholder="Your name" />
+              <input name="user_name" required placeholder="Your name" />
             </label>
             <label className="field">
               <span>Email</span>
               <input
-                name="email"
+                name="user_email"
                 required
                 type="email"
                 placeholder="you@organisation.com"
@@ -109,15 +138,30 @@ export function Contact() {
           </label>
           <button
             type="submit"
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-forest px-6 py-3.5 font-bold text-white transition hover:bg-[#3d7025]"
+            disabled={isSubmitting}
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-forest px-6 py-3.5 font-bold text-white transition hover:bg-[#3d7025] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Send enquiry <Send size={17} />
+            {isSubmitting ? "Sending..." : "Send enquiry"} <Send size={17} />
           </button>
-          {sent && (
-            <p className="mt-3 text-sm font-semibold text-forest">
-              Your email client should open with the enquiry ready to send.
-            </p>
+
+          {submitStatus === "success" && (
+            <div className="mt-4 p-4 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center gap-3">
+              <CheckCircle className="text-emerald-600" size={20} />
+              <p className="text-sm font-semibold text-emerald-700">
+                Message sent successfully! We'll get back to you soon.
+              </p>
+            </div>
           )}
+
+          {submitStatus === "error" && (
+            <div className="mt-4 p-4 rounded-lg bg-red-50 border border-red-200 flex items-center gap-3">
+              <AlertCircle className="text-red-600" size={20} />
+              <p className="text-sm font-semibold text-red-700">
+                Something went wrong. Please try again or email us directly.
+              </p>
+            </div>
+          )}
+
           <p className="mt-3 text-xs text-slate-400">
             Enquiries are routed to agamweholdings2@gmail.com.
           </p>
